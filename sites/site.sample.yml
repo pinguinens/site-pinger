@@ -1,0 +1,7 @@
+site:
+  method: get
+  domain: example.com
+  port: 443
+  hosts:
+    - 0.0.0.0
+    - 127.0.0.1

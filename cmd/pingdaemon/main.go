@@ -24,10 +24,6 @@ type Config struct {
 	Hosts  []string `yaml:"hosts"`
 }
 
-func init() {
-	net.DefaultResolver.PreferGo = true
-}
-
 func main() {
 	configBytes, err := os.ReadFile("config.yml")
 	if err != nil {
