@@ -27,10 +27,10 @@ func init() {
 func main() {
 	appConf, err := config.New(configPath)
 	if err != nil {
-		panic(err)
+		log.Fatal().Msg(err.Error())
 	}
 
-	file, err := os.OpenFile("out.log", os.O_WRONLY, 0755)
+	file, err := os.OpenFile(appConf.GetLogFile(), os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
 		log.Print(err)
 	}

@@ -1,21 +1,20 @@
 package config
 
 import (
+	"fmt"
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/creasty/defaults"
+	"github.com/go-playground/validator/v10"
 )
 
 const (
 	defaultConfigPath = "./config.yml"
+	timeLayout        = "2006-01-02T15-04-05"
 )
-
-type Config struct {
-	URI    string   `yaml:"uri"`
-	Domain string   `yaml:"domain"`
-	Port   int      `yaml:"port"`
-	Hosts  []string `yaml:"hosts"`
-}
 
 func New(path string) (*Config, error) {
 	cp := path
@@ -34,5 +33,44 @@ func New(path string) (*Config, error) {
 		return nil, err
 	}
 
+	err = c.setDefaults()
+	if err != nil {
+		return nil, err
+	}
+
+	err = c.validate()
+	if err != nil {
+		return nil, err
+	}
+
 	return &c, nil
+}
+
+type Config struct {
+	LogFile string `yaml:"log_file" default:"./d_%v.log"`
+
+	URI    string   `yaml:"uri"`
+	Domain string   `yaml:"domain"`
+	Port   int      `yaml:"port"`
+	Hosts  []string `yaml:"hosts"`
+}
+
+func (c *Config) setDefaults() error {
+	return defaults.Set(c)
+}
+
+func (c *Config) validate() error {
+	validate := validator.New()
+	err := validate.Struct(c)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Config) GetLogFile() string {
+	lf := fmt.Sprintf(c.LogFile, time.Now().Format(timeLayout))
+
+	return lf
 }

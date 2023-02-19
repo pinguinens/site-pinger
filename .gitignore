@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 .build/*
+.logs/*
 *.log
 *.yml
 !.gitkeep

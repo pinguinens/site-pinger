@@ -1,3 +1,4 @@
+log_file: ./logs/d_%v.log
 uri: https://example.com/
 domain: example.com
 port: 443
