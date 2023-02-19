@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"io"
 	"net"
@@ -10,28 +11,21 @@ import (
 	"os"
 	"time"
 
-	"gopkg.in/yaml.v3"
-
 	"github.com/rs/zerolog/log"
 
+	"github.com/pinguinens/site-pinger/internal/config"
 	"github.com/pinguinens/site-pinger/internal/logger"
 )
 
-type Config struct {
-	URI    string   `yaml:"uri"`
-	Domain string   `yaml:"domain"`
-	Port   int      `yaml:"port"`
-	Hosts  []string `yaml:"hosts"`
+var configPath string
+
+func init() {
+	flag.StringVar(&configPath, "c", "", "Custom config path")
+	flag.Parse()
 }
 
 func main() {
-	configBytes, err := os.ReadFile("config.yml")
-	if err != nil {
-		panic(err)
-	}
-
-	config := Config{}
-	err = yaml.Unmarshal(configBytes, &config)
+	appConf, err := config.New(configPath)
 	if err != nil {
 		panic(err)
 	}
@@ -49,8 +43,8 @@ func main() {
 		KeepAlive: 30 * time.Second,
 	}
 	http.DefaultTransport.(*http.Transport).DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
-		if addr == fmt.Sprintf("%v:%v", config.Domain, config.Port) {
-			addr = fmt.Sprintf("%v:%v", config.Hosts[0], config.Port)
+		if addr == fmt.Sprintf("%v:%v", appConf.Domain, appConf.Port) {
+			addr = fmt.Sprintf("%v:%v", appConf.Hosts[0], appConf.Port)
 		}
 		return dialer.DialContext(ctx, network, addr)
 	}
@@ -58,7 +52,7 @@ func main() {
 	headers := http.Header{}
 	headers.Add("User-Agent", "SitePingerDaemon/0.1")
 
-	requestUrl, err := url.Parse(config.URI)
+	requestUrl, err := url.Parse(appConf.URI)
 	if err != nil {
 		log.Print(err)
 	}
