@@ -2,4 +2,6 @@
 .vscode/
 .build/*
 *.log
+*.yml
 !.gitkeep
+!*.sample.yml

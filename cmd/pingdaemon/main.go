@@ -5,12 +5,29 @@ import (
 	"net/http"
 	"os"
 
+	"gopkg.in/yaml.v3"
+
 	"github.com/rs/zerolog/log"
 
 	"github.com/pinguinens/site-pinger/internal/logger"
 )
 
+type Config struct {
+	URL string `yaml:"url"`
+}
+
 func main() {
+	configBytes, err := os.ReadFile("config.yml")
+	if err != nil {
+		panic(err)
+	}
+
+	config := Config{}
+	err = yaml.Unmarshal(configBytes, &config)
+	if err != nil {
+		panic(err)
+	}
+
 	file, err := os.OpenFile("out.log", os.O_WRONLY, 0755)
 	if err != nil {
 		log.Print(err)
@@ -19,7 +36,7 @@ func main() {
 
 	logger := logger.New(file)
 
-	resp, err := http.Get("https://example.ru/")
+	resp, err := http.Get(config.URL)
 	if err != nil {
 		log.Print(err)
 	}
