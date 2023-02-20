@@ -8,7 +8,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -30,13 +29,11 @@ func main() {
 		log.Fatal().Msg(err.Error())
 	}
 
-	file, err := os.OpenFile(appConf.GetLogFile(), os.O_WRONLY|os.O_CREATE, 0755)
+	appLogger, err := logger.New(appConf.GetLogFile())
 	if err != nil {
-		log.Print(err)
+		log.Fatal().Msg(err.Error())
 	}
-	defer file.Close()
-
-	logger := logger.New(file)
+	defer logger.CloseLogFile()
 
 	dialer := &net.Dialer{
 		Timeout:   30 * time.Second,
@@ -54,7 +51,7 @@ func main() {
 
 	requestUrl, err := url.Parse(appConf.URI)
 	if err != nil {
-		log.Print(err)
+		appLogger.Print(err)
 	}
 
 	request := http.Request{
@@ -88,18 +85,16 @@ func main() {
 		Timeout:       0,
 	}
 	resp, err := client.Do(&request)
-
-	//resp, err := http.Get(config.URL)
 	if err != nil {
-		log.Print(err)
+		appLogger.Print(err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Print(err)
+		appLogger.Print(err)
 	}
 
-	logger.Info().Int("status_code", resp.StatusCode).Msg(string(body))
-	logger.Debug().Msg("finish")
+	appLogger.Info().Int("status_code", resp.StatusCode).Msg(string(body))
+	appLogger.Debug().Msg("finish")
 }
