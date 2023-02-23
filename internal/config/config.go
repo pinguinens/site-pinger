@@ -49,6 +49,9 @@ func New(path string) (*Config, error) {
 type Config struct {
 	LogFile string `yaml:"log_file" default:"./d_%v.log"`
 
+	DialerTimeout   time.Duration `yaml:"dialer_timeout" default:"30"`
+	DialerKeepAlive time.Duration `yaml:"dialer_keepalive" default:"30"`
+
 	URI    string   `yaml:"uri"`
 	Domain string   `yaml:"domain"`
 	Port   int      `yaml:"port"`
