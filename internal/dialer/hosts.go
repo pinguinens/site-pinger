@@ -7,4 +7,9 @@ type Host struct {
 	Addr   string
 }
 
-func (t *HostTable) Add(domain, addr string) {}
+func (t HostTable) Add(domain, addr string) {
+	t[domain] = Host{
+		Domain: domain,
+		Addr:   addr,
+	}
+}

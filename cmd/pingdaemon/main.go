@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"github.com/pinguinens/site-pinger/internal/dialer"
+	"io"
 
+	"github.com/pinguinens/site-pinger/internal/dialer"
 	"github.com/rs/zerolog/log"
 
 	"github.com/pinguinens/site-pinger/internal/config"
@@ -29,8 +30,21 @@ func main() {
 	}
 	defer logger.CloseLogFile()
 
-	appDialer := dialer.New(appConf.DialerTimeout, appConf.DialerTimeout)
+	// TODO: hosts
+	hosts := dialer.HostTable{}
+	hosts.Add(appConf.Domain, appConf.Hosts[0])
 
-	appLogger.Info().Int("status_code", resp.StatusCode).Msg(string(body))
+	_ = dialer.New(appConf.DialerTimeout, appConf.DialerTimeout, &hosts)
+
+	response, err := dialer.Ping(appConf.URI)
+	if err != nil {
+		log.Error().Msg(err.Error())
+	}
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		log.Print(err)
+	}
+
+	appLogger.Info().Int("status_code", response.StatusCode).Msg(string(body))
 	appLogger.Debug().Msg("finish")
 }

@@ -3,7 +3,6 @@ package dialer
 import (
 	"context"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -11,72 +10,50 @@ import (
 	"time"
 )
 
-var hosts HostTable
+var resolveTable HostTable
 
-func New(timeout, keepAlive time.Duration) *net.Dialer {
+func New(timeout, keepAlive time.Duration, hosts *HostTable) *net.Dialer {
 	dialer := &net.Dialer{
 		Timeout:   timeout * time.Second,
 		KeepAlive: keepAlive * time.Second,
 	}
 
-	http.DefaultTransport.(*http.Transport).DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
-		parts := strings.Split(addr, ":")
+	if hosts != nil {
+		resolveTable = *hosts
 
-		addr = fmt.Sprintf("%v:%v", hosts[parts[0]].Addr, parts[1])
+		http.DefaultTransport.(*http.Transport).DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
+			parts := strings.Split(addr, ":")
 
-		return dialer.DialContext(ctx, network, addr)
+			addr = fmt.Sprintf("%v:%v", resolveTable[parts[0]].Addr, parts[1])
+
+			return dialer.DialContext(ctx, network, addr)
+		}
 	}
 
 	return dialer
 }
 
-func Hosts() {
+func Ping(uri string) (*http.Response, error) {
+	client := http.Client{}
+
 	headers := http.Header{}
 	headers.Add("User-Agent", "SitePingerDaemon/0.1")
 
-	requestUrl, err := url.Parse(appConf.URI)
+	requestUrl, err := url.Parse(uri)
 	if err != nil {
-		appLogger.Print(err)
+		return nil, err
 	}
 
 	request := http.Request{
-		Method:           http.MethodGet,
-		URL:              requestUrl,
-		Proto:            "",
-		ProtoMajor:       0,
-		ProtoMinor:       0,
-		Header:           headers,
-		Body:             nil,
-		GetBody:          nil,
-		ContentLength:    0,
-		TransferEncoding: nil,
-		Close:            false,
-		Host:             "",
-		Form:             nil,
-		PostForm:         nil,
-		MultipartForm:    nil,
-		Trailer:          nil,
-		RemoteAddr:       "",
-		RequestURI:       "",
-		TLS:              nil,
-		Cancel:           nil,
-		Response:         nil,
+		Method: http.MethodGet,
+		URL:    requestUrl,
+		Header: headers,
 	}
 
-	client := http.Client{
-		Transport:     nil,
-		CheckRedirect: nil,
-		Jar:           nil,
-		Timeout:       0,
-	}
 	resp, err := client.Do(&request)
 	if err != nil {
-		appLogger.Print(err)
+		return nil, err
 	}
-	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		appLogger.Print(err)
-	}
+	return resp, nil
 }
