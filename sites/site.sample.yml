@@ -1,7 +1,6 @@
-site:
+target:
   method: get
-  domain: example.com
-  port: 443
+  uri: https://example.com/
   hosts:
     - 0.0.0.0
     - 127.0.0.1

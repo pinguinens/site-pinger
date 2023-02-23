@@ -2,13 +2,13 @@ package main
 
 import (
 	"flag"
-	"github.com/pinguinens/site-pinger/internal/daemon"
 	"io"
 
-	"github.com/pinguinens/site-pinger/internal/dialer"
 	"github.com/rs/zerolog/log"
 
 	"github.com/pinguinens/site-pinger/internal/config"
+	"github.com/pinguinens/site-pinger/internal/daemon"
+	"github.com/pinguinens/site-pinger/internal/dialer"
 	"github.com/pinguinens/site-pinger/internal/logger"
 )
 
