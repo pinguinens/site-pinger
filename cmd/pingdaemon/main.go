@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/pinguinens/site-pinger/internal/daemon"
 	"io"
 
 	"github.com/pinguinens/site-pinger/internal/dialer"
@@ -47,4 +48,7 @@ func main() {
 
 	appLogger.Info().Int("status_code", response.StatusCode).Msg(string(body))
 	appLogger.Debug().Msg("finish")
+
+	app := daemon.New(appLogger)
+	app.Start()
 }
