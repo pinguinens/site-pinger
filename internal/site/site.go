@@ -1,6 +1,7 @@
 package site
 
 import (
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -28,9 +29,9 @@ func ParseDir(dirName string) ([]Site, error) {
 		return nil, err
 	}
 
-	sl := make([]Site, 0, len(files))
+	sl := make([]Site, len(files), len(files))
 	for i, f := range files {
-		sl[i], err = ParseFile(f.Name())
+		sl[i], err = ParseFile(fmt.Sprintf("%v%v%v", dn, string(os.PathSeparator), f.Name()))
 		if err != nil {
 			return nil, err
 		}

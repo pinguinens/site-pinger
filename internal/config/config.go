@@ -22,11 +22,6 @@ type Config struct {
 
 	DialerTimeout   time.Duration `yaml:"dialer_timeout" default:"30"`
 	DialerKeepAlive time.Duration `yaml:"dialer_keepalive" default:"30"`
-
-	URI    string   `yaml:"uri"`
-	Domain string   `yaml:"domain"`
-	Port   int      `yaml:"port"`
-	Hosts  []string `yaml:"hosts"`
 }
 
 func New(path string) (*Config, error) {
