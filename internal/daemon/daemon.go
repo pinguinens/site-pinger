@@ -8,39 +8,50 @@ import (
 
 	log "github.com/rs/zerolog"
 
-	"github.com/pinguinens/site-pinger/internal/dialer"
+	"github.com/pinguinens/site-pinger/internal/resource"
 	"github.com/pinguinens/site-pinger/internal/site"
 )
 
 type Daemon struct {
-	logger *log.Logger
-	dialer *net.Dialer
-	sites  []site.Site
+	logger    *log.Logger
+	resources []resource.Resource
 }
 
 func New(logger *log.Logger, sites []site.Site, dialerTimeout, dialerKeepAlive time.Duration) Daemon {
-	hosts := dialer.HostTable{}
+	var resources []resource.Resource
+	dialer := &net.Dialer{
+		Timeout:   dialerTimeout * time.Second,
+		KeepAlive: dialerKeepAlive * time.Second,
+	}
+
 	for _, s := range sites {
 		uri, err := url.Parse(s.Target.URI)
 		if err != nil {
 			logger.Error().Msg(err.Error())
 		}
 
-		hosts.Add(uri.Host, s.Target.Hosts[0])
+		for _, h := range s.Target.Hosts {
+			resources = append(resources, resource.New(
+				s.Target.Method,
+				s.Target.URI,
+				resource.Host{
+					Domain: uri.Host,
+					Addr:   h,
+				},
+				dialer),
+			)
+		}
 	}
 
-	d := dialer.New(dialerTimeout, dialerKeepAlive, &hosts)
-
 	return Daemon{
-		logger: logger,
-		dialer: d,
-		sites:  sites,
+		logger:    logger,
+		resources: resources,
 	}
 }
 
 func (d *Daemon) Start() {
-	for _, s := range d.sites {
-		response, err := dialer.Ping(s.Target.URI)
+	for _, s := range d.resources {
+		response, err := s.Ping()
 		if err != nil {
 			d.logger.Error().Msg(err.Error())
 		}

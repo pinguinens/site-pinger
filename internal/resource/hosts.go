@@ -1,4 +1,4 @@
-package dialer
+package resource
 
 type HostTable map[string]Host
 
