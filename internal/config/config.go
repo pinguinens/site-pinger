@@ -16,6 +16,19 @@ const (
 	timeLayout        = "2006-01-02T15-04-05"
 )
 
+type Config struct {
+	LogFile string `yaml:"log_file" default:"./d_%v.log"`
+	SiteDir string `yaml:"site_dir" default:"./sites"`
+
+	DialerTimeout   time.Duration `yaml:"dialer_timeout" default:"30"`
+	DialerKeepAlive time.Duration `yaml:"dialer_keepalive" default:"30"`
+
+	URI    string   `yaml:"uri"`
+	Domain string   `yaml:"domain"`
+	Port   int      `yaml:"port"`
+	Hosts  []string `yaml:"hosts"`
+}
+
 func New(path string) (*Config, error) {
 	cp := path
 	if path == "" {
@@ -44,18 +57,6 @@ func New(path string) (*Config, error) {
 	}
 
 	return &c, nil
-}
-
-type Config struct {
-	LogFile string `yaml:"log_file" default:"./d_%v.log"`
-
-	DialerTimeout   time.Duration `yaml:"dialer_timeout" default:"30"`
-	DialerKeepAlive time.Duration `yaml:"dialer_keepalive" default:"30"`
-
-	URI    string   `yaml:"uri"`
-	Domain string   `yaml:"domain"`
-	Port   int      `yaml:"port"`
-	Hosts  []string `yaml:"hosts"`
 }
 
 func (c *Config) setDefaults() error {

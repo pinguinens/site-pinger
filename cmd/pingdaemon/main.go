@@ -10,6 +10,7 @@ import (
 	"github.com/pinguinens/site-pinger/internal/daemon"
 	"github.com/pinguinens/site-pinger/internal/dialer"
 	"github.com/pinguinens/site-pinger/internal/logger"
+	"github.com/pinguinens/site-pinger/internal/site"
 )
 
 var configPath string
@@ -31,6 +32,11 @@ func main() {
 	}
 	defer logger.CloseLogFile()
 
+	sites, err := site.ParseDir(appConf.SiteDir)
+	if err != nil {
+		log.Fatal().Msg(err.Error())
+	}
+
 	// TODO: hosts
 	hosts := dialer.HostTable{}
 	hosts.Add(appConf.Domain, appConf.Hosts[0])
@@ -49,6 +55,6 @@ func main() {
 	appLogger.Info().Int("status_code", response.StatusCode).Msg(string(body))
 	appLogger.Debug().Msg("finish")
 
-	app := daemon.New(appLogger)
+	app := daemon.New(appLogger, sites)
 	app.Start()
 }

@@ -4,9 +4,13 @@ import (
 	"os"
 
 	"gopkg.in/yaml.v3"
-	
+
 	"github.com/creasty/defaults"
 	"github.com/go-playground/validator/v10"
+)
+
+const (
+	defaultPath = "./sites"
 )
 
 type Site struct {
@@ -14,7 +18,25 @@ type Site struct {
 }
 
 func ParseDir(dirName string) ([]Site, error) {
-	return nil, nil
+	dn := defaultPath
+	if dirName != "" {
+		dn = dirName
+	}
+
+	files, err := os.ReadDir(dn)
+	if err != nil {
+		return nil, err
+	}
+
+	sl := make([]Site, 0, len(files))
+	for i, f := range files {
+		sl[i], err = ParseFile(f.Name())
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return sl, nil
 }
 
 func ParseFile(fileName string) (Site, error) {

@@ -1,4 +1,5 @@
 log_file: ./logs/d_%v.log
+site_dir: ./sites
 uri: https://example.com/
 domain: example.com
 port: 443
