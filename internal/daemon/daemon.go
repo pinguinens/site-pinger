@@ -19,7 +19,7 @@ type Daemon struct {
 
 func New(logger *log.Logger, sites []site.Site, dialerTimeout, dialerKeepAlive time.Duration) Daemon {
 	var resources []resource.Resource
-	dialer := &net.Dialer{
+	dialer := net.Dialer{
 		Timeout:   dialerTimeout * time.Second,
 		KeepAlive: dialerKeepAlive * time.Second,
 	}

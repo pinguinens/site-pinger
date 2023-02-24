@@ -16,18 +16,17 @@ type Resource struct {
 	dialer *net.Dialer
 }
 
-func New(method, uri string, host Host, dialer *net.Dialer) Resource {
+func New(method, uri string, host Host, dialer net.Dialer) Resource {
 	return Resource{
 		Method: method,
 		URI:    uri,
 		Host:   host,
-		dialer: dialer,
+		dialer: &dialer,
 	}
 }
 
 func (r *Resource) Ping() (*http.Response, error) {
-	http.DefaultTransport.(*http.Transport).DialContext = nil
-	http.DefaultTransport.(*http.Transport).DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
+	dcFunc := func(ctx context.Context, network, addr string) (net.Conn, error) {
 		parts := strings.Split(addr, ":")
 
 		if addr == fmt.Sprintf("%v:%v", r.Host.Domain, parts[1]) {
@@ -37,7 +36,13 @@ func (r *Resource) Ping() (*http.Response, error) {
 		return r.dialer.DialContext(ctx, network, addr)
 	}
 
-	client := http.Client{}
+	transport := &http.Transport{
+		DialContext: dcFunc,
+	}
+
+	client := http.Client{
+		Transport: transport,
+	}
 
 	headers := http.Header{}
 	headers.Add("User-Agent", "SitePingerDaemon/0.1")
