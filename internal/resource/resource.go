@@ -16,12 +16,12 @@ type Resource struct {
 	dialer *net.Dialer
 }
 
-func New(method, uri string, host Host, dialer net.Dialer) Resource {
+func New(method, uri string, host Host, dialer *net.Dialer) Resource {
 	return Resource{
 		Method: method,
 		URI:    uri,
 		Host:   host,
-		dialer: &dialer,
+		dialer: dialer,
 	}
 }
 

@@ -4,7 +4,6 @@ import (
 	"io"
 	"net"
 	"net/url"
-	"time"
 
 	log "github.com/rs/zerolog"
 
@@ -17,12 +16,8 @@ type Daemon struct {
 	resources []resource.Resource
 }
 
-func New(logger *log.Logger, sites []site.Site, dialerTimeout, dialerKeepAlive time.Duration) Daemon {
+func New(logger *log.Logger, sites []site.Site, dialer *net.Dialer) Daemon {
 	var resources []resource.Resource
-	dialer := net.Dialer{
-		Timeout:   dialerTimeout * time.Second,
-		KeepAlive: dialerKeepAlive * time.Second,
-	}
 
 	for _, s := range sites {
 		uri, err := url.Parse(s.Target.URI)
