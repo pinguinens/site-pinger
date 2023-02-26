@@ -20,8 +20,7 @@ type Config struct {
 	LogFile string `yaml:"log_file" default:"./d_%v.log"`
 	SiteDir string `yaml:"site_dir" default:"./sites"`
 
-	DialerTimeout   time.Duration `yaml:"dialer_timeout" default:"30"`
-	DialerKeepAlive time.Duration `yaml:"dialer_keepalive" default:"30"`
+	Dialer Dialer `yaml:"dialer"`
 }
 
 func New(path string) (*Config, error) {

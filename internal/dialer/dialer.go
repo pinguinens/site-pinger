@@ -7,8 +7,8 @@ import (
 
 func New(dialerTimeout, dialerKeepAlive time.Duration) *net.Dialer {
 	dialer := &net.Dialer{
-		Timeout:   dialerTimeout * time.Second,
-		KeepAlive: dialerKeepAlive * time.Second,
+		Timeout:   dialerTimeout,
+		KeepAlive: dialerKeepAlive,
 	}
 
 	return dialer

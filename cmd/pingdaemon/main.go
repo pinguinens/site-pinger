@@ -35,7 +35,7 @@ func main() {
 		log.Fatal().Msg(err.Error())
 	}
 
-	appDialer := dialer.New(appConf.DialerTimeout, appConf.DialerKeepAlive)
+	appDialer := dialer.New(appConf.Dialer.Timeout, appConf.Dialer.KeepAlive)
 
 	app := daemon.New(appLogger, sites, appDialer)
 	app.Start()
