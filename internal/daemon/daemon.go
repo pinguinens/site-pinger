@@ -1,9 +1,13 @@
 package daemon
 
 import (
+	"context"
+	"fmt"
 	"io"
 	"net"
+	"net/http"
 	"net/url"
+	"strings"
 
 	log "github.com/rs/zerolog"
 
@@ -26,6 +30,14 @@ func New(logger *log.Logger, sites []site.Site, dialer *net.Dialer) Daemon {
 		}
 
 		for _, h := range s.Target.Hosts {
+			transport := http.Transport{
+				DialContext: makeDialContext(uri.Host, h, dialer),
+			}
+
+			client := &http.Client{
+				Transport: &transport,
+			}
+
 			resources = append(resources, resource.New(
 				s.Target.Method,
 				s.Target.URI,
@@ -33,7 +45,7 @@ func New(logger *log.Logger, sites []site.Site, dialer *net.Dialer) Daemon {
 					Domain: uri.Host,
 					Addr:   h,
 				},
-				dialer),
+				client),
 			)
 		}
 	}
@@ -58,5 +70,17 @@ func (d *Daemon) Start() {
 
 			d.logger.Info().Int("status_code", response.StatusCode).Msg(string(body))
 		}
+	}
+}
+
+func makeDialContext(domain, host string, dialer *net.Dialer) func(ctx context.Context, network, addr string) (net.Conn, error) {
+	return func(ctx context.Context, network, addr string) (net.Conn, error) {
+		parts := strings.Split(addr, ":")
+
+		if addr == fmt.Sprintf("%v:%v", domain, parts[1]) {
+			addr = fmt.Sprintf("%v:%v", host, parts[1])
+		}
+
+		return dialer.DialContext(ctx, network, addr)
 	}
 }
