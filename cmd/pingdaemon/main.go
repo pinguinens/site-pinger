@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
-	defer logger.CloseLogFile()
+	defer appLogger.Close()
 
 	sites, err := site.ParseDir(appConf.SiteDir)
 	if err != nil {

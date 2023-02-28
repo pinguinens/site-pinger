@@ -9,18 +9,17 @@ import (
 	"net/url"
 	"strings"
 
-	log "github.com/rs/zerolog"
-
+	"github.com/pinguinens/site-pinger/internal/logger"
 	"github.com/pinguinens/site-pinger/internal/resource"
 	"github.com/pinguinens/site-pinger/internal/site"
 )
 
 type Daemon struct {
-	logger    *log.Logger
+	logger    *logger.Logger
 	resources []resource.Resource
 }
 
-func New(logger *log.Logger, sites []site.Site, dialer *net.Dialer) Daemon {
+func New(logger *logger.Logger, sites []site.Site, dialer *net.Dialer) Daemon {
 	var resources []resource.Resource
 
 	for _, s := range sites {
