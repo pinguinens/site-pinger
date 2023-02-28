@@ -6,7 +6,6 @@ import (
 
 	"github.com/pinguinens/site-pinger/internal/config"
 	"github.com/pinguinens/site-pinger/internal/daemon"
-	"github.com/pinguinens/site-pinger/internal/dialer"
 	"github.com/pinguinens/site-pinger/internal/logger"
 	"github.com/pinguinens/site-pinger/internal/site"
 )
@@ -35,8 +34,6 @@ func main() {
 		log.Fatal().Msg(err.Error())
 	}
 
-	appDialer := dialer.New(appConf.Dialer.Timeout, appConf.Dialer.KeepAlive)
-
-	app := daemon.New(appLogger, sites, appDialer)
+	app := daemon.New(appLogger, sites)
 	app.Start()
 }

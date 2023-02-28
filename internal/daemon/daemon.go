@@ -1,14 +1,10 @@
 package daemon
 
 import (
-	"context"
-	"fmt"
 	"io"
-	"net"
-	"net/http"
 	"net/url"
-	"strings"
 
+	"github.com/pinguinens/site-pinger/internal/connector"
 	"github.com/pinguinens/site-pinger/internal/logger"
 	"github.com/pinguinens/site-pinger/internal/resource"
 	"github.com/pinguinens/site-pinger/internal/site"
@@ -19,7 +15,7 @@ type Daemon struct {
 	resources []resource.Resource
 }
 
-func New(logger *logger.Logger, sites []site.Site, dialer *net.Dialer) Daemon {
+func New(logger *logger.Logger, sites []site.Site) Daemon {
 	var resources []resource.Resource
 
 	for _, s := range sites {
@@ -29,13 +25,7 @@ func New(logger *logger.Logger, sites []site.Site, dialer *net.Dialer) Daemon {
 		}
 
 		for _, h := range s.Target.Hosts {
-			transport := http.Transport{
-				DialContext: makeDialContext(uri.Host, h, dialer),
-			}
-
-			client := &http.Client{
-				Transport: &transport,
-			}
+			client := connector.New(uri.Host, h)
 
 			resources = append(resources, resource.New(
 				s.Target.Method,
@@ -69,17 +59,5 @@ func (d *Daemon) Start() {
 
 			d.logger.Info().Int("status_code", response.StatusCode).Msg(string(body))
 		}
-	}
-}
-
-func makeDialContext(domain, host string, dialer *net.Dialer) func(ctx context.Context, network, addr string) (net.Conn, error) {
-	return func(ctx context.Context, network, addr string) (net.Conn, error) {
-		parts := strings.Split(addr, ":")
-
-		if addr == fmt.Sprintf("%v:%v", domain, parts[1]) {
-			addr = fmt.Sprintf("%v:%v", host, parts[1])
-		}
-
-		return dialer.DialContext(ctx, network, addr)
 	}
 }
