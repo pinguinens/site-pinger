@@ -15,10 +15,13 @@ type Daemon struct {
 	resources []resource.Resource
 }
 
-func New(logger *logger.Logger, sites []site.Site) Daemon {
+func New(logger *logger.Logger, sites site.Collection) Daemon {
 	var resources []resource.Resource
 
-	for _, s := range sites {
+	hostsList, _ := sites.GetHostsList()
+	logger.Info().Any("hosts", hostsList)
+
+	for _, s := range sites.List {
 		uri, err := url.Parse(s.Target.URI)
 		if err != nil {
 			logger.Error().Msg(err.Error())
