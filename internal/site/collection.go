@@ -12,7 +12,13 @@ func (c *Collection) GetHostsList() ([]HostTable, error) {
 		return c.hosts, nil
 	}
 
-	return c.makeHosts()
+	var err error
+	c.hosts, err = c.makeHosts()
+	if err != nil {
+		return nil, err
+	}
+
+	return c.hosts, err
 }
 
 func (c *Collection) makeHosts() ([]HostTable, error) {

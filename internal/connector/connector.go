@@ -6,17 +6,19 @@ import (
 	"net"
 	"net/http"
 	"strings"
+
+	"github.com/pinguinens/site-pinger/internal/site"
 )
 
 type Connector struct {
 	*http.Client
 }
 
-func New(domain, host string) *Connector {
+func New(hosts site.HostTable) *Connector {
 	dialer := &net.Dialer{}
 
 	transport := http.Transport{
-		DialContext: makeDialContext(domain, host, dialer),
+		DialContext: makeDialContext(dialer, hosts),
 	}
 
 	client := &http.Client{
@@ -26,12 +28,12 @@ func New(domain, host string) *Connector {
 	return &Connector{client}
 }
 
-func makeDialContext(domain, host string, dialer *net.Dialer) func(ctx context.Context, network, addr string) (net.Conn, error) {
+func makeDialContext(dialer *net.Dialer, hosts site.HostTable) func(ctx context.Context, network, addr string) (net.Conn, error) {
 	return func(ctx context.Context, network, addr string) (net.Conn, error) {
-		parts := strings.Split(addr, ":")
+		reqUri := strings.Split(addr, ":")
 
-		if addr == fmt.Sprintf("%v:%v", domain, parts[1]) {
-			addr = fmt.Sprintf("%v:%v", host, parts[1])
+		if ip, ok := hosts[reqUri[0]]; ok {
+			addr = fmt.Sprintf("%v:%v", ip, reqUri[1])
 		}
 
 		return dialer.DialContext(ctx, network, addr)

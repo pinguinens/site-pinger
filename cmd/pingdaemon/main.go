@@ -5,6 +5,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/pinguinens/site-pinger/internal/config"
+	"github.com/pinguinens/site-pinger/internal/connector"
 	"github.com/pinguinens/site-pinger/internal/daemon"
 	"github.com/pinguinens/site-pinger/internal/logger"
 	"github.com/pinguinens/site-pinger/internal/site"
@@ -34,6 +35,15 @@ func main() {
 		log.Fatal().Msg(err.Error())
 	}
 
-	app := daemon.New(appLogger, sites)
+	hostTables, err := sites.GetHostsList()
+	if err != nil {
+		log.Fatal().Msg(err.Error())
+	}
+	clients := make([]*connector.Connector, 0, len(hostTables))
+	for _, hosts := range hostTables {
+		clients = append(clients, connector.New(hosts))
+	}
+
+	app := daemon.New(appLogger, clients, sites)
 	app.Start()
 }

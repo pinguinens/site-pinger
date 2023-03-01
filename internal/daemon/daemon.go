@@ -15,11 +15,8 @@ type Daemon struct {
 	resources []resource.Resource
 }
 
-func New(logger *logger.Logger, sites site.Collection) Daemon {
+func New(logger *logger.Logger, clients []*connector.Connector, sites site.Collection) Daemon {
 	var resources []resource.Resource
-
-	hostsList, _ := sites.GetHostsList()
-	logger.Info().Any("hosts", hostsList)
 
 	for _, s := range sites.List {
 		uri, err := url.Parse(s.Target.URI)
@@ -28,8 +25,6 @@ func New(logger *logger.Logger, sites site.Collection) Daemon {
 		}
 
 		for _, h := range s.Target.Hosts {
-			client := connector.New(uri.Host, h)
-
 			resources = append(resources, resource.New(
 				s.Target.Method,
 				s.Target.URI,
