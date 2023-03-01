@@ -12,6 +12,7 @@ import (
 
 type Daemon struct {
 	logger    *logger.Logger
+	clients   []*connector.Connector
 	resources []resource.Resource
 }
 
@@ -24,7 +25,7 @@ func New(logger *logger.Logger, clients []*connector.Connector, sites site.Colle
 			logger.Error().Msg(err.Error())
 		}
 
-		for _, h := range s.Target.Hosts {
+		for i, h := range s.Target.Hosts {
 			resources = append(resources, resource.New(
 				s.Target.Method,
 				s.Target.URI,
@@ -32,7 +33,7 @@ func New(logger *logger.Logger, clients []*connector.Connector, sites site.Colle
 					Domain: uri.Host,
 					Addr:   h,
 				},
-				client),
+				clients[i]),
 			)
 		}
 	}
@@ -40,6 +41,7 @@ func New(logger *logger.Logger, clients []*connector.Connector, sites site.Colle
 	return Daemon{
 		logger:    logger,
 		resources: resources,
+		clients:   clients,
 	}
 }
 
