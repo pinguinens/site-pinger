@@ -10,11 +10,7 @@ import (
 	"github.com/pinguinens/site-pinger/internal/site"
 )
 
-type Connector struct {
-	*http.Client
-}
-
-func New(hosts site.HostTable) *Connector {
+func New(hosts site.HostTable) *http.Client {
 	dialer := &net.Dialer{}
 
 	transport := http.Transport{
@@ -25,7 +21,7 @@ func New(hosts site.HostTable) *Connector {
 		Transport: &transport,
 	}
 
-	return &Connector{client}
+	return client
 }
 
 func makeDialContext(dialer *net.Dialer, hosts site.HostTable) func(ctx context.Context, network, addr string) (net.Conn, error) {

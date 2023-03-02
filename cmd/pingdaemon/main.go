@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"net/http"
+
 	"github.com/rs/zerolog/log"
 
 	"github.com/pinguinens/site-pinger/internal/config"
@@ -39,7 +41,7 @@ func main() {
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
-	clients := make([]*connector.Connector, 0, len(hostTables))
+	clients := make([]*http.Client, 0, len(hostTables))
 	for _, hosts := range hostTables {
 		clients = append(clients, connector.New(hosts))
 	}
