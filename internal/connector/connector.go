@@ -10,18 +10,24 @@ import (
 	"github.com/pinguinens/site-pinger/internal/site"
 )
 
-func New(hosts site.HostTable) *http.Client {
-	dialer := &net.Dialer{}
+const (
+	clientName = "SitePinger"
+)
 
-	transport := http.Transport{
-		DialContext: makeDialContext(dialer, hosts),
+type Connector struct {
+	Client        *http.Client
+	identificator string
+}
+
+func New(hosts site.HostTable, version string) *Connector {
+	return &Connector{
+		&http.Client{
+			Transport: &http.Transport{
+				DialContext: makeDialContext(&net.Dialer{}, hosts),
+			},
+		},
+		fmt.Sprintf("%v/%v", clientName, version),
 	}
-
-	client := &http.Client{
-		Transport: &transport,
-	}
-
-	return client
 }
 
 func makeDialContext(dialer *net.Dialer, hosts site.HostTable) func(ctx context.Context, network, addr string) (net.Conn, error) {
@@ -34,4 +40,8 @@ func makeDialContext(dialer *net.Dialer, hosts site.HostTable) func(ctx context.
 
 		return dialer.DialContext(ctx, network, addr)
 	}
+}
+
+func (c *Connector) GetIdentificator() string {
+	return c.identificator
 }

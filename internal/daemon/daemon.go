@@ -2,9 +2,9 @@ package daemon
 
 import (
 	"io"
-	"net/http"
 	"net/url"
 
+	"github.com/pinguinens/site-pinger/internal/connector"
 	"github.com/pinguinens/site-pinger/internal/logger"
 	"github.com/pinguinens/site-pinger/internal/resource"
 	"github.com/pinguinens/site-pinger/internal/site"
@@ -12,11 +12,11 @@ import (
 
 type Daemon struct {
 	logger    *logger.Logger
-	clients   []*http.Client
+	clients   []*connector.Connector
 	resources []resource.Resource
 }
 
-func New(logger *logger.Logger, clients []*http.Client, sites site.Collection) Daemon {
+func New(logger *logger.Logger, clients []*connector.Connector, sites site.Collection) Daemon {
 	resources := make([]resource.Resource, 0, len(clients)*len(sites.List))
 	for _, s := range sites.List {
 		uri, err := url.Parse(s.Target.URI)

@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"net/http"
 
 	"github.com/rs/zerolog/log"
 
@@ -11,6 +10,10 @@ import (
 	"github.com/pinguinens/site-pinger/internal/daemon"
 	"github.com/pinguinens/site-pinger/internal/logger"
 	"github.com/pinguinens/site-pinger/internal/site"
+)
+
+const (
+	appVersion = "0.1.3"
 )
 
 var configPath string
@@ -41,9 +44,9 @@ func main() {
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
-	clients := make([]*http.Client, 0, len(hostTables))
+	clients := make([]*connector.Connector, 0, len(hostTables))
 	for _, hosts := range hostTables {
-		clients = append(clients, connector.New(hosts))
+		clients = append(clients, connector.New(hosts, appVersion))
 	}
 
 	app := daemon.New(appLogger, clients, sites)

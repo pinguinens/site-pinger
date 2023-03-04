@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/go-http-utils/headers v0.0.0-20181008091004-fed159eddc2a // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/kr/text v0.2.0 // indirect

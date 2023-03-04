@@ -1,1 +1,1 @@
-# site-pinger
+# Site Pinger

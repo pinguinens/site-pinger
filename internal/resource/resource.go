@@ -4,27 +4,31 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/go-http-utils/headers"
+
+	"github.com/pinguinens/site-pinger/internal/connector"
 )
 
 type Resource struct {
-	Method string
-	URI    string
-	Host   Host
-	client *http.Client
+	Method    string
+	URI       string
+	Host      Host
+	connector *connector.Connector
 }
 
-func New(method, uri string, host Host, client *http.Client) Resource {
+func New(method, uri string, host Host, client *connector.Connector) Resource {
 	return Resource{
-		Method: method,
-		URI:    uri,
-		Host:   host,
-		client: client,
+		Method:    method,
+		URI:       uri,
+		Host:      host,
+		connector: client,
 	}
 }
 
 func (r *Resource) Ping() (*http.Response, error) {
-	headers := http.Header{}
-	headers.Add("User-Agent", "SitePingerDaemon/0.1")
+	reqHeaders := http.Header{}
+	reqHeaders.Add(headers.UserAgent, r.connector.GetIdentificator())
 
 	requestUrl, err := url.Parse(r.URI)
 	if err != nil {
@@ -34,10 +38,10 @@ func (r *Resource) Ping() (*http.Response, error) {
 	request := http.Request{
 		Method: strings.ToUpper(r.Method),
 		URL:    requestUrl,
-		Header: headers,
+		Header: reqHeaders,
 	}
 
-	resp, err := r.client.Do(&request)
+	resp, err := r.connector.Client.Do(&request)
 	if err != nil {
 		return nil, err
 	}
