@@ -17,8 +17,7 @@ type Daemon struct {
 }
 
 func New(logger *logger.Logger, clients []*http.Client, sites site.Collection) Daemon {
-	var resources []resource.Resource
-
+	resources := make([]resource.Resource, 0, len(clients)*len(sites.List))
 	for _, s := range sites.List {
 		uri, err := url.Parse(s.Target.URI)
 		if err != nil {
