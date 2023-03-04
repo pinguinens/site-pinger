@@ -7,6 +7,13 @@ import (
 	log "github.com/rs/zerolog"
 )
 
+const (
+	BodyField       = "body"
+	MethodField     = "method"
+	StatusCodeField = "status_code"
+	UrlField        = "url"
+)
+
 type Processor struct {
 	logger *log.Logger
 }
@@ -21,7 +28,7 @@ func (p *Processor) ProcessResponse(response *http.Response) error {
 		return err
 	}
 
-	p.logger.Info().Int("status_code", response.StatusCode).Msg(string(body))
+	p.logger.Log().Str(MethodField, response.Request.Method).Str(UrlField, response.Request.URL.String()).Int(StatusCodeField, response.StatusCode).Bytes(BodyField, body).Send()
 
 	return nil
 }

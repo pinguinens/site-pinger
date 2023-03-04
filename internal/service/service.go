@@ -53,10 +53,14 @@ func (d *Service) Start() {
 			d.logger.Error().Msg(err.Error())
 		}
 		if response != nil {
-			err := d.processor.ProcessResponse(response)
+			err = d.processor.ProcessResponse(response)
 			if err != nil {
 				d.logger.Error().Msg(err.Error())
 			}
+		}
+		err = response.Body.Close()
+		if err != nil {
+			d.logger.Error().Msg(err.Error())
 		}
 	}
 }
