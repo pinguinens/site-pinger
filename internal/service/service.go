@@ -1,7 +1,7 @@
-package daemon
+package service
 
 import (
-	"io"
+	"github.com/pinguinens/site-pinger/internal/processor"
 	"net/url"
 
 	"github.com/pinguinens/site-pinger/internal/connector"
@@ -10,13 +10,14 @@ import (
 	"github.com/pinguinens/site-pinger/internal/site"
 )
 
-type Daemon struct {
+type Service struct {
 	logger    *logger.Logger
+	processor *processor.Processor
 	clients   []*connector.Connector
 	resources []resource.Resource
 }
 
-func New(logger *logger.Logger, clients []*connector.Connector, sites site.Collection) Daemon {
+func New(logger *logger.Logger, processor *processor.Processor, clients []*connector.Connector, sites site.Collection) Service {
 	resources := make([]resource.Resource, 0, len(clients)*len(sites.List))
 	for _, s := range sites.List {
 		uri, err := url.Parse(s.Target.URI)
@@ -37,26 +38,25 @@ func New(logger *logger.Logger, clients []*connector.Connector, sites site.Colle
 		}
 	}
 
-	return Daemon{
+	return Service{
 		logger:    logger,
+		processor: processor,
 		resources: resources,
 		clients:   clients,
 	}
 }
 
-func (d *Daemon) Start() {
+func (d *Service) Start() {
 	for _, s := range d.resources {
 		response, err := s.Ping()
 		if err != nil {
 			d.logger.Error().Msg(err.Error())
 		}
 		if response != nil {
-			body, err := io.ReadAll(response.Body)
+			err := d.processor.ProcessResponse(response)
 			if err != nil {
-				d.logger.Print(err)
+				d.logger.Error().Msg(err.Error())
 			}
-
-			d.logger.Info().Int("status_code", response.StatusCode).Msg(string(body))
 		}
 	}
 }

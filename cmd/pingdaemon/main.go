@@ -7,8 +7,9 @@ import (
 
 	"github.com/pinguinens/site-pinger/internal/config"
 	"github.com/pinguinens/site-pinger/internal/connector"
-	"github.com/pinguinens/site-pinger/internal/daemon"
 	"github.com/pinguinens/site-pinger/internal/logger"
+	"github.com/pinguinens/site-pinger/internal/processor"
+	"github.com/pinguinens/site-pinger/internal/service"
 	"github.com/pinguinens/site-pinger/internal/site"
 )
 
@@ -35,6 +36,8 @@ func main() {
 	}
 	defer appLogger.Close()
 
+	appProcessor := processor.New(&appLogger.Logger)
+
 	sites, err := site.ParseDir(appConf.SiteDir)
 	if err != nil {
 		log.Fatal().Msg(err.Error())
@@ -49,6 +52,6 @@ func main() {
 		clients = append(clients, connector.New(hosts, appVersion))
 	}
 
-	app := daemon.New(appLogger, clients, sites)
+	app := service.New(appLogger, &appProcessor, clients, sites)
 	app.Start()
 }
