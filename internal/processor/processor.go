@@ -2,16 +2,22 @@ package processor
 
 import (
 	"io"
+	"net"
 	"net/http"
+	"net/url"
+	"strings"
 
 	log "github.com/rs/zerolog"
 )
 
 const (
+	AddrField       = "addr"
 	BodyField       = "body"
 	MethodField     = "method"
 	StatusCodeField = "status_code"
 	UrlField        = "url"
+
+	DefaultStatusCode = 0
 )
 
 type Processor struct {
@@ -28,7 +34,24 @@ func (p *Processor) ProcessResponse(response *http.Response) error {
 		return err
 	}
 
-	p.logger.Log().Str(MethodField, response.Request.Method).Str(UrlField, response.Request.URL.String()).Int(StatusCodeField, response.StatusCode).Bytes(BodyField, body).Send()
+	p.logger.Log().Int(StatusCodeField, response.StatusCode).Str(MethodField, response.Request.Method).Str(UrlField, response.Request.URL.String()).Bytes(BodyField, body).Send()
 
 	return nil
+}
+
+func (p *Processor) ProcessError(err error) error {
+	switch e := err.(type) {
+	case *url.Error:
+		if ie, ok := e.Err.(*net.OpError); ok {
+			p.logger.Log().Int(StatusCodeField, DefaultStatusCode).Str(MethodField, strings.ToUpper(e.Op)).Str(UrlField, e.URL).Str(AddrField, ie.Addr.String()).Send()
+
+			return nil
+		}
+
+		p.logger.Log().Int(StatusCodeField, DefaultStatusCode).Str(MethodField, strings.ToUpper(e.Op)).Str(UrlField, e.URL).Send()
+
+		return nil
+	}
+
+	return err
 }

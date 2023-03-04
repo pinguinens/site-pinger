@@ -50,17 +50,25 @@ func (d *Service) Start() {
 	for _, s := range d.resources {
 		response, err := s.Ping()
 		if err != nil {
-			d.logger.Error().Msg(err.Error())
+			err = d.processor.ProcessError(err)
+			if err != nil {
+				d.logger.Error().Msg(err.Error())
+				continue
+			}
+			continue
 		}
+
 		if response != nil {
 			err = d.processor.ProcessResponse(response)
 			if err != nil {
 				d.logger.Error().Msg(err.Error())
+				continue
 			}
-		}
-		err = response.Body.Close()
-		if err != nil {
-			d.logger.Error().Msg(err.Error())
+			err = response.Body.Close()
+			if err != nil {
+				d.logger.Error().Msg(err.Error())
+				continue
+			}
 		}
 	}
 }

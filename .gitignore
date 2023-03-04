@@ -4,5 +4,6 @@
 .logs/*
 *.log
 *.yml
+*.yml_
 !.gitkeep
 !*.sample.yml
