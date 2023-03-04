@@ -3,8 +3,14 @@ package site
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v3"
+)
+
+const (
+	fileSuffixS = ".yml"
+	fileSuffixF = ".yaml"
 )
 
 func ParseDir(dirName string) (Collection, error) {
@@ -18,11 +24,21 @@ func ParseDir(dirName string) (Collection, error) {
 		return Collection{}, err
 	}
 
-	sl := make([]Site, len(files), len(files))
-	for i, f := range files {
-		sl[i], err = ParseFile(fmt.Sprintf("%v%v%v", dn, string(os.PathSeparator), f.Name()))
-		if err != nil {
-			return Collection{}, err
+	var count uint16
+	for _, f := range files {
+		if strings.HasSuffix(f.Name(), fileSuffixS) || strings.HasSuffix(f.Name(), fileSuffixF) {
+			count++
+		}
+	}
+
+	sl := make([]Site, 0, count)
+	for _, f := range files {
+		if strings.HasSuffix(f.Name(), fileSuffixS) || strings.HasSuffix(f.Name(), fileSuffixF) {
+			s, err := ParseFile(fmt.Sprintf("%v%v%v", dn, string(os.PathSeparator), f.Name()))
+			if err != nil {
+				return Collection{}, err
+			}
+			sl = append(sl, s)
 		}
 	}
 
