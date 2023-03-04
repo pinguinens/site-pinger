@@ -16,6 +16,12 @@ var (
 )
 
 func New(logFileName string) (*Logger, error) {
+	if logFileName == "" {
+		return &Logger{
+			Logger: log.New(os.Stdout).With().Timestamp().Logger(),
+		}, nil
+	}
+
 	var err error
 	logFile, err = os.OpenFile(logFileName, os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {

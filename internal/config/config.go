@@ -17,7 +17,7 @@ const (
 )
 
 type Config struct {
-	LogFile string `yaml:"log_file" default:"./d_%v.log"`
+	LogFile string `yaml:"log_file"`
 	SiteDir string `yaml:"site_dir" default:"./sites"`
 }
 
@@ -66,7 +66,9 @@ func (c *Config) validate() error {
 }
 
 func (c *Config) GetLogFile() string {
-	lf := fmt.Sprintf(c.LogFile, time.Now().Format(timeLayout))
+	if c.LogFile != "" {
+		return fmt.Sprintf(c.LogFile, time.Now().Format(timeLayout))
+	}
 
-	return lf
+	return ""
 }
