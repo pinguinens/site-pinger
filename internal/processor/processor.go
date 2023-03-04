@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/go-http-utils/headers"
 	log "github.com/rs/zerolog"
 )
 
@@ -18,6 +19,8 @@ const (
 	UrlField        = "url"
 
 	DefaultStatusCode = 0
+
+	TextMime = "text"
 )
 
 type Processor struct {
@@ -34,7 +37,12 @@ func (p *Processor) ProcessResponse(response *http.Response) error {
 		return err
 	}
 
-	p.logger.Log().Int(StatusCodeField, response.StatusCode).Str(MethodField, response.Request.Method).Str(UrlField, response.Request.URL.String()).Bytes(BodyField, body).Send()
+	if strings.HasPrefix(response.Header.Get(headers.ContentType), TextMime) {
+		p.logger.Log().Int(StatusCodeField, response.StatusCode).Str(MethodField, response.Request.Method).Str(UrlField, response.Request.URL.String()).Str(AddrField, response.Request.RemoteAddr).Bytes(BodyField, body).Send()
+		return nil
+	}
+
+	p.logger.Log().Int(StatusCodeField, response.StatusCode).Str(MethodField, response.Request.Method).Str(UrlField, response.Request.URL.String()).Str(AddrField, response.Request.RemoteAddr).Send()
 
 	return nil
 }

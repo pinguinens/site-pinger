@@ -36,9 +36,10 @@ func (r *Resource) Ping() (*http.Response, error) {
 	}
 
 	request := http.Request{
-		Method: strings.ToUpper(r.Method),
-		URL:    requestUrl,
-		Header: reqHeaders,
+		Method:     strings.ToUpper(r.Method),
+		URL:        requestUrl,
+		Header:     reqHeaders,
+		RemoteAddr: r.Host.Addr,
 	}
 
 	resp, err := r.connector.Client.Do(&request)
