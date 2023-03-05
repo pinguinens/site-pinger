@@ -1,19 +1,22 @@
 package logger
 
 import (
+	"fmt"
 	"os"
+	"strings"
+	"time"
 
 	log "github.com/rs/zerolog"
+)
+
+const (
+	timeLayout = "2006-01-02T15-04-05"
 )
 
 type Logger struct {
 	log.Logger
 	file *os.File
 }
-
-var (
-	logFile *os.File
-)
 
 func New(logFileName string) (*Logger, error) {
 	if logFileName == "" {
@@ -23,7 +26,11 @@ func New(logFileName string) (*Logger, error) {
 	}
 
 	var err error
-	logFile, err = os.OpenFile(logFileName, os.O_WRONLY|os.O_CREATE, 0755)
+	fn := logFileName
+	if strings.Contains(logFileName, "%v") {
+		fn = fmt.Sprintf(logFileName, time.Now().Format(timeLayout))
+	}
+	logFile, err := os.OpenFile(fn, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0755)
 	if err != nil {
 		return nil, err
 	}

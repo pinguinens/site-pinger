@@ -30,7 +30,7 @@ func main() {
 		log.Fatal().Msg(err.Error())
 	}
 
-	appLogger, err := logger.New(appConf.GetLogFile())
+	appLogger, err := logger.New(appConf.LogFileName)
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}

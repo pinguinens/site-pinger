@@ -1,9 +1,7 @@
 package config
 
 import (
-	"fmt"
 	"os"
-	"time"
 
 	"gopkg.in/yaml.v3"
 
@@ -13,12 +11,11 @@ import (
 
 const (
 	defaultConfigPath = "./config.yml"
-	timeLayout        = "2006-01-02T15-04-05"
 )
 
 type Config struct {
-	LogFile string `yaml:"log_file"`
-	SiteDir string `yaml:"site_dir" default:"./sites"`
+	LogFileName string `yaml:"log_file"`
+	SiteDir     string `yaml:"site_dir" default:"./sites"`
 }
 
 func New(path string) (*Config, error) {
@@ -63,12 +60,4 @@ func (c *Config) validate() error {
 	}
 
 	return nil
-}
-
-func (c *Config) GetLogFile() string {
-	if c.LogFile != "" {
-		return fmt.Sprintf(c.LogFile, time.Now().Format(timeLayout))
-	}
-
-	return ""
 }

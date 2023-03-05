@@ -1,11 +1,11 @@
 package service
 
 import (
-	"github.com/pinguinens/site-pinger/internal/processor"
 	"net/url"
 
 	"github.com/pinguinens/site-pinger/internal/connector"
 	"github.com/pinguinens/site-pinger/internal/logger"
+	"github.com/pinguinens/site-pinger/internal/processor"
 	"github.com/pinguinens/site-pinger/internal/resource"
 	"github.com/pinguinens/site-pinger/internal/site"
 )
