@@ -17,6 +17,7 @@ type Config struct {
 	LogFileName   string `yaml:"log_file"`
 	ConsoleFormat string `yaml:"console_format" default:"pretty"`
 	SiteDir       string `yaml:"site_dir" default:"./sites"`
+	Alarm         Alarm  `yaml:"alarm"`
 }
 
 func New(path string) (*Config, error) {

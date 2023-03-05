@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	appVersion = "0.1.4"
+	appVersion = "0.2"
 )
 
 var configPath string
