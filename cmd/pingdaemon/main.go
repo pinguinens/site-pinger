@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	appVersion = "0.1.3"
+	appVersion = "0.1.4"
 )
 
 var configPath string
@@ -30,7 +30,7 @@ func main() {
 		log.Fatal().Msg(err.Error())
 	}
 
-	appLogger, err := logger.New(appConf.LogFileName)
+	appLogger, err := logger.New(appConf.LogFileName, appConf.ConsoleFormat)
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}

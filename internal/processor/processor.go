@@ -1,19 +1,16 @@
 package processor
 
 import (
-	"io"
 	"net"
 	"net/http"
 	"net/url"
 	"strings"
 
-	"github.com/go-http-utils/headers"
 	log "github.com/rs/zerolog"
 )
 
 const (
 	AddrField       = "addr"
-	BodyField       = "body"
 	MethodField     = "method"
 	StatusCodeField = "status_code"
 	UrlField        = "url"
@@ -32,16 +29,6 @@ func New(logger *log.Logger) Processor {
 }
 
 func (p *Processor) ProcessResponse(response *http.Response) error {
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return err
-	}
-
-	if strings.HasPrefix(response.Header.Get(headers.ContentType), TextMime) {
-		p.logger.Log().Int(StatusCodeField, response.StatusCode).Str(MethodField, response.Request.Method).Str(UrlField, response.Request.URL.String()).Str(AddrField, response.Request.RemoteAddr).Bytes(BodyField, body).Send()
-		return nil
-	}
-
 	p.logger.Log().Int(StatusCodeField, response.StatusCode).Str(MethodField, response.Request.Method).Str(UrlField, response.Request.URL.String()).Str(AddrField, response.Request.RemoteAddr).Send()
 
 	return nil
