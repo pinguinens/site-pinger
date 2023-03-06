@@ -8,6 +8,7 @@ import (
 	"github.com/pinguinens/site-pinger/internal/config"
 	"github.com/pinguinens/site-pinger/internal/connector"
 	"github.com/pinguinens/site-pinger/internal/logger"
+	"github.com/pinguinens/site-pinger/internal/messenger"
 	"github.com/pinguinens/site-pinger/internal/processor"
 	"github.com/pinguinens/site-pinger/internal/service"
 	"github.com/pinguinens/site-pinger/internal/site"
@@ -36,7 +37,16 @@ func main() {
 	}
 	defer appLogger.Close()
 
-	appProcessor := processor.New(&appLogger.Logger)
+	var messegeSrv *messenger.Messenger
+	if appConf.Messenger.Enabled {
+		messegeSrv, err = messenger.New(appConf.Messenger.Address, appConf.Messenger.AlarmCodes)
+		if err != nil {
+			log.Fatal().Msg(err.Error())
+		}
+		defer messegeSrv.Close()
+	}
+
+	appProcessor := processor.New(&appLogger.Logger, messegeSrv)
 
 	sites, err := site.ParseDir(appConf.SiteDir)
 	if err != nil {

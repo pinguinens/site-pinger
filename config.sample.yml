@@ -1,5 +1,7 @@
 log_file: ./logs/d_%v.log
 console_format: pretty
 site_dir: ./sites
-alarm:
+messenger:
   enabled: true
+  alarm_codes: *
+  address: localhost:8081

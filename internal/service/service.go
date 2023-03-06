@@ -1,9 +1,6 @@
 package service
 
 import (
-	"bufio"
-	"fmt"
-	"net"
 	"net/url"
 
 	"github.com/pinguinens/site-pinger/internal/connector"
@@ -50,17 +47,9 @@ func New(logger *logger.Logger, processor *processor.Processor, clients []*conne
 }
 
 func (d *Service) Start() {
-	// TODO: tcp messenger client
-	conn, _ := net.Dial("tcp", "localhost:8081")
-	fmt.Fprintf(conn, "%v\n", "ping started")
-	message, _ := bufio.NewReader(conn).ReadString('\n')
-	d.logger.Info().Str("messenger", "connection").Msg(message)
-
 	for _, s := range d.resources {
 		response, err := s.Ping()
 		if err != nil {
-			fmt.Fprintf(conn, "%v\n", err.Error())
-
 			err = d.processor.ProcessError(err)
 			if err != nil {
 				d.logger.Error().Msg(err.Error())
@@ -70,8 +59,6 @@ func (d *Service) Start() {
 		}
 
 		if response != nil {
-			fmt.Fprintf(conn, "%v\n", s.Host.Addr)
-
 			err = d.processor.ProcessResponse(response)
 			if err != nil {
 				d.logger.Error().Msg(err.Error())
