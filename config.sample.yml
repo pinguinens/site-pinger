@@ -3,5 +3,10 @@ console_format: pretty
 site_dir: ./sites
 messenger:
   enabled: true
-  alarm_codes: *
+  alarm_codes:
+    - "*"
+  #    - "0"
+  #    - "200"
+  #    - "4**"
+  #    - "5**"
   address: localhost:8081
