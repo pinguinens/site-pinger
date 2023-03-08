@@ -30,12 +30,12 @@ func (m *Messenger) Close() error {
 func (m *Messenger) Send(msg string) error {
 	fmt.Fprintf(m.conn, "%v", msg)
 	rBytes := make([]byte, 128)
-	message, err := m.conn.Read(rBytes)
+	_, err := m.conn.Read(rBytes)
 	if err != nil {
 		return err
 	}
-	if string(message) != "OK" {
-		return errors.New(fmt.Sprintf("message server return: %v", message))
+	if string(rBytes) != "OK" {
+		return errors.New(fmt.Sprintf("message server not OK: %v", string(rBytes)))
 	}
 
 	return nil
