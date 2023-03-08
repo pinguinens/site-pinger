@@ -22,10 +22,10 @@ const (
 
 type Processor struct {
 	logger    *log.Logger
-	messenger *messenger.Messenger
+	messenger messenger.Messenger
 }
 
-func New(logger *log.Logger, messegeSrv *messenger.Messenger) Processor {
+func New(logger *log.Logger, messegeSrv messenger.Messenger) Processor {
 	return Processor{
 		logger:    logger,
 		messenger: messegeSrv,
