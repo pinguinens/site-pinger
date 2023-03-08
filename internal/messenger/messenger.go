@@ -29,7 +29,7 @@ func (m *Messenger) Close() error {
 
 func (m *Messenger) Send(msg string) error {
 	fmt.Fprintf(m.conn, "%v", msg)
-	rBytes := make([]byte, 1024)
+	rBytes := make([]byte, 128)
 	message, err := m.conn.Read(rBytes)
 	if err != nil {
 		return err
@@ -42,16 +42,5 @@ func (m *Messenger) Send(msg string) error {
 }
 
 func (m *Messenger) Alarm(code int, method, url, addr string) error {
-	// TODO: define format
-	fmt.Fprintf(m.conn, "%v|%v|%v|%v\n", code, method, url, addr)
-	rBytes := make([]byte, 1024)
-	_, err := m.conn.Read(rBytes)
-	if err != nil {
-		return err
-	}
-	if string(rBytes) != "OK" {
-		return errors.New(fmt.Sprintf("message server return: %v", rBytes))
-	}
-
-	return nil
+	return m.Send(fmt.Sprintf("%v\n%v\n%v\n%v", code, method, url, addr))
 }
