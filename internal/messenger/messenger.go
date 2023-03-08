@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strconv"
 )
 
 type Messenger struct {
@@ -42,5 +43,41 @@ func (m *Messenger) Send(msg string) error {
 }
 
 func (m *Messenger) Alarm(code int, method, url, addr string) error {
-	return m.Send(fmt.Sprintf("%v\n%v\n%v\n%v", code, method, url, addr))
+	if m.isAlarm(code) {
+		return m.Send(fmt.Sprintf("%v\n%v\n%v\n%v", code, method, url, addr))
+	}
+
+	return nil
+}
+
+func (m *Messenger) isAlarm(code int) bool {
+	for _, c := range m.codes {
+		switch c {
+		case "1**":
+			if !(code >= 100 && code <= 199) {
+				return false
+			}
+		case "2**":
+			if !(code >= 200 && code <= 299) {
+				return false
+			}
+		case "3**":
+			if !(code >= 300 && code <= 399) {
+				return false
+			}
+		case "4**":
+			if !(code >= 400 && code <= 499) {
+				return false
+			}
+		case "5**":
+			if !(code >= 500 && code <= 599) {
+				return false
+			}
+		}
+		if strconv.Itoa(code) == c {
+			return true
+		}
+	}
+
+	return true
 }
