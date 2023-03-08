@@ -1,7 +1,6 @@
 package messenger
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"net"
@@ -29,12 +28,13 @@ func (m *Messenger) Close() error {
 }
 
 func (m *Messenger) Send(msg string) error {
-	fmt.Fprintf(m.conn, "%v\n", msg)
-	message, err := bufio.NewReader(m.conn).ReadString('\n')
+	fmt.Fprintf(m.conn, "%v", msg)
+	rBytes := make([]byte, 1024)
+	message, err := m.conn.Read(rBytes)
 	if err != nil {
 		return err
 	}
-	if message != "OK\n" {
+	if string(message) != "OK" {
 		return errors.New(fmt.Sprintf("message server return: %v", message))
 	}
 
@@ -44,12 +44,13 @@ func (m *Messenger) Send(msg string) error {
 func (m *Messenger) Alarm(code int, method, url, addr string) error {
 	// TODO: define format
 	fmt.Fprintf(m.conn, "%v|%v|%v|%v\n", code, method, url, addr)
-	message, err := bufio.NewReader(m.conn).ReadString('\n')
+	rBytes := make([]byte, 1024)
+	_, err := m.conn.Read(rBytes)
 	if err != nil {
 		return err
 	}
-	if message != "OK\n" {
-		return errors.New(fmt.Sprintf("message server return: %v", message))
+	if string(rBytes) != "OK" {
+		return errors.New(fmt.Sprintf("message server return: %v", rBytes))
 	}
 
 	return nil
