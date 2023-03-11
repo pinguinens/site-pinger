@@ -35,7 +35,14 @@ func (m *MsgService) Send(msg string) error {
 	if err != nil {
 		return err
 	}
-	if string(rBytes) != "OK" {
+
+	content := make([]byte, 0, len(rBytes))
+	for _, v := range rBytes {
+		if v != 0 {
+			content = append(content, v)
+		}
+	}
+	if string(content) != "OK" {
 		return errors.New(fmt.Sprintf("message server not OK: %v", string(rBytes)))
 	}
 
