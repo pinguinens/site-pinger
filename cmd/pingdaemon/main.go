@@ -1,13 +1,7 @@
 package main
 
 import (
-	"context"
 	"flag"
-	"os"
-	"os/signal"
-	"sync"
-	"syscall"
-	"time"
 
 	"github.com/rs/zerolog/log"
 
@@ -18,7 +12,6 @@ import (
 	dummyMsgSvc "github.com/pinguinens/site-pinger/internal/messenger/dummy"
 	"github.com/pinguinens/site-pinger/internal/messenger/msgsvc"
 	"github.com/pinguinens/site-pinger/internal/processor"
-	"github.com/pinguinens/site-pinger/internal/service"
 	"github.com/pinguinens/site-pinger/internal/site"
 )
 
@@ -72,34 +65,5 @@ func main() {
 		clients = append(clients, connector.New(hosts, appVersion))
 	}
 
-	app := service.New(appLogger, &appProcessor, clients, sites)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	go func() {
-		exit := make(chan os.Signal, 1)
-		signal.Notify(exit, os.Interrupt, syscall.SIGTERM)
-		<-exit
-		cancel()
-	}()
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-
-		for {
-			select {
-			case <-ctx.Done():
-				log.Info().Msg("Stopping app")
-				return
-			default:
-				app.Start(ctx)
-				time.Sleep(5 * time.Second)
-			}
-
-		}
-	}()
-
-	wg.Wait()
-	log.Info().Msg("App stopped")
+	runApp(appLogger, appProcessor, clients, sites)
 }
