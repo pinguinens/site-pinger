@@ -1,0 +1,33 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="pingdaemon_linux" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <output_file path="$PROJECT_DIR$/.build/out.log" />
+    <log_file checked="false" alias="log" path="$PROJECT_DIR$/.build/out.log" />
+    <module name="site-pinger" />
+    <working_directory value="$PROJECT_DIR$" />
+    <go_parameters value="-o ../../.build/pingdaemon" />
+    <envs>
+      <env name="GOOS" value="linux" />
+      <env name="GOARCH" value="386" />
+    </envs>
+    <EXTENSION ID="net.ashald.envfile">
+      <option name="IS_ENABLED" value="false" />
+      <option name="IS_SUBST" value="false" />
+      <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+      <option name="IS_IGNORE_MISSING_FILES" value="false" />
+      <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+      <ENTRIES>
+        <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+      </ENTRIES>
+    </EXTENSION>
+    <kind value="DIRECTORY" />
+    <package value="github.com/pinguinens/site-pingerr" />
+    <directory value="$PROJECT_DIR$/cmd/pingdaemon" />
+    <filePath value="$PROJECT_DIR$" />
+    <output_directory value="$PROJECT_DIR$/.build" />
+    <option name="run" value="false" />
+    <method v="2">
+      <option name="GoBeforeRunTask" command="env -w GOOS=linux" />
+      <option name="GoBeforeRunTask" command="env -w GOARCH=386" />
+    </method>
+  </configuration>
+</component>
