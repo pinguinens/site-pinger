@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"net/url"
 
 	"github.com/pinguinens/site-pinger/internal/connector"
@@ -46,28 +47,34 @@ func New(logger *logger.Logger, processor *processor.Processor, clients []*conne
 	}
 }
 
-func (d *Service) Start() {
+func (d *Service) Start(ctx context.Context) {
 	for _, s := range d.resources {
-		response, err := s.Ping()
-		if err != nil {
-			err = d.processor.ProcessError(err)
+		select {
+		case <-ctx.Done():
+			d.logger.Info().Msg("Stopping service...")
+			return
+		default:
+			response, err := s.Ping()
 			if err != nil {
-				d.logger.Error().Msg(err.Error())
+				err = d.processor.ProcessError(err)
+				if err != nil {
+					d.logger.Error().Msg(err.Error())
+					continue
+				}
 				continue
 			}
-			continue
-		}
 
-		if response != nil {
-			err = d.processor.ProcessResponse(response)
-			if err != nil {
-				d.logger.Error().Msg(err.Error())
-				continue
-			}
-			err = response.Body.Close()
-			if err != nil {
-				d.logger.Error().Msg(err.Error())
-				continue
+			if response != nil {
+				err = d.processor.ProcessResponse(response)
+				if err != nil {
+					d.logger.Error().Msg(err.Error())
+					continue
+				}
+				err = response.Body.Close()
+				if err != nil {
+					d.logger.Error().Msg(err.Error())
+					continue
+				}
 			}
 		}
 	}

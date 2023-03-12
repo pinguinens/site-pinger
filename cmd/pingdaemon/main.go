@@ -90,10 +90,10 @@ func main() {
 		for {
 			select {
 			case <-ctx.Done():
-				log.Info().Msg("Stopping service")
+				log.Info().Msg("Stopping app")
 				return
 			default:
-				app.Start()
+				app.Start(ctx)
 				time.Sleep(5 * time.Second)
 			}
 
@@ -101,5 +101,5 @@ func main() {
 	}()
 
 	wg.Wait()
-	log.Info().Msg("Service stopped")
+	log.Info().Msg("App stopped")
 }
