@@ -65,5 +65,5 @@ func main() {
 		clients = append(clients, connector.New(hosts, appVersion))
 	}
 
-	runApp(appLogger, appProcessor, clients, sites)
+	runApp(appLogger, appProcessor, clients, sites, &appConf.ProcessTimeout)
 }

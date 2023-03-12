@@ -17,7 +17,7 @@ import (
 	"github.com/pinguinens/site-pinger/internal/site"
 )
 
-func runApp(logger *logger.Logger, processor *processor.Processor, clients []*connector.Connector, sites site.Collection) {
+func runApp(logger *logger.Logger, processor *processor.Processor, clients []*connector.Connector, sites site.Collection, timeout *time.Duration) {
 	app := service.New(logger, processor, clients, sites)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -40,7 +40,7 @@ func runApp(logger *logger.Logger, processor *processor.Processor, clients []*co
 				return
 			default:
 				app.Start(ctx)
-				time.Sleep(5 * time.Second)
+				time.Sleep(*timeout)
 			}
 
 		}

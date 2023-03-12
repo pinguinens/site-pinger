@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
 
@@ -14,10 +15,11 @@ const (
 )
 
 type Config struct {
-	LogFileName   string    `yaml:"log_file"`
-	ConsoleFormat string    `yaml:"console_format" default:"pretty"`
-	SiteDir       string    `yaml:"site_dir" default:"./sites"`
-	Messenger     Messenger `yaml:"messenger"`
+	LogFileName    string        `yaml:"log_file"`
+	ConsoleFormat  string        `yaml:"console_format" default:"pretty"`
+	SiteDir        string        `yaml:"site_dir" default:"./sites"`
+	Messenger      Messenger     `yaml:"messenger"`
+	ProcessTimeout time.Duration `yaml:"process_timeout" default:"10m"`
 }
 
 func New(path string) (*Config, error) {

@@ -10,3 +10,4 @@ messenger:
   #    - "4**"
   #    - "5**"
   address: localhost:8081
+process_timeout: 3s
