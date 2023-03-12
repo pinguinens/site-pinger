@@ -1,7 +1,13 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
 
 	"github.com/rs/zerolog/log"
 
@@ -17,7 +23,7 @@ import (
 )
 
 const (
-	appVersion = "0.2.1"
+	appVersion = "0.3"
 )
 
 var configPath string
@@ -67,5 +73,33 @@ func main() {
 	}
 
 	app := service.New(appLogger, &appProcessor, clients, sites)
-	app.Start()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		exit := make(chan os.Signal, 1)
+		signal.Notify(exit, os.Interrupt, syscall.SIGTERM)
+		<-exit
+		cancel()
+	}()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		for {
+			select {
+			case <-ctx.Done():
+				log.Info().Msg("Stopping service")
+				return
+			default:
+				app.Start()
+				time.Sleep(5 * time.Second)
+			}
+
+		}
+	}()
+
+	wg.Wait()
+	log.Info().Msg("Service stopped")
 }
