@@ -56,6 +56,7 @@ func (d *Service) Start(ctx context.Context) {
 		default:
 			response, err := s.Ping()
 			if err != nil {
+				d.logger.Debug().Str("response", "error").Msg(err.Error())
 				err = d.processor.ProcessError(err)
 				if err != nil {
 					d.logger.Error().Msg(err.Error())

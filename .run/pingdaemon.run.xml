@@ -19,6 +19,9 @@
     <directory value="$PROJECT_DIR$/cmd/pingdaemon" />
     <filePath value="$PROJECT_DIR$" />
     <output_directory value="$PROJECT_DIR$/.build" />
-    <method v="2" />
+    <method v="2">
+      <option name="GoBeforeRunTask" command="env -w GOOS=windows" />
+      <option name="GoBeforeRunTask" command="env -w GOARCH=amd64" />
+    </method>
   </configuration>
 </component>

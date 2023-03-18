@@ -2,6 +2,7 @@ package connector
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
@@ -23,7 +24,8 @@ func New(hosts site.HostTable, version string) *Connector {
 	return &Connector{
 		&http.Client{
 			Transport: &http.Transport{
-				DialContext: makeDialContext(&net.Dialer{}, hosts),
+				DialContext:     makeDialContext(&net.Dialer{}, hosts),
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
 		},
 		fmt.Sprintf("%v/%v", clientName, version),
